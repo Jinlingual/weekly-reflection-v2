@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>週次振り返りシート</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI',sans-serif;min-height:100vh;padding:20px 14px 70px;color:#1a1a1a;overflow-x:hidden}
+
+/* ── 水彩背景 ── */
+.bg{position:fixed;inset:0;background:#f0ebe1;z-index:-1;overflow:hidden}
+.bg::before{content:'';position:absolute;top:-80px;left:-100px;right:-100px;height:320px;background:radial-gradient(ellipse 55% 65% at 18% 45%,rgba(14,11,7,.68) 0%,transparent 62%),radial-gradient(ellipse 48% 58% at 82% 38%,rgba(11,8,5,.72) 0%,transparent 58%),radial-gradient(ellipse 36% 42% at 50% 22%,rgba(16,12,8,.4) 0%,transparent 68%);filter:blur(10px)}
+.bg::after{content:'';position:absolute;top:8%;left:-40px;width:160px;height:220px;background:radial-gradient(ellipse at 30% 50%,rgba(14,11,7,.28) 0%,transparent 70%);filter:blur(8px)}
+.bg-ts{position:absolute;top:53%;left:-6%;width:50%;height:13px;background:#2a9d8f;transform:rotate(-6deg);border-radius:40%;opacity:.52;filter:blur(2.5px)}
+.bg-tb{position:absolute;top:7%;left:60%;width:58px;height:72px;background:#2a9d8f;border-radius:38% 62% 55% 45%/48% 44% 56% 52%;opacity:.42;filter:blur(3px)}
+.bg-td{position:absolute;bottom:12%;left:40%;width:32px;height:48px;background:#2a9d8f;border-radius:50% 50% 42% 58%;opacity:.48;filter:blur(2px)}
+#bgC{position:absolute;inset:0;width:100%;height:100%}
+
+/* ── レイアウト ── */
+.wrap{max-width:640px;margin:0 auto;position:relative;z-index:1}
+
+/* ── ヘッダー ── */
+.hdr{text-align:center;margin-bottom:14px}
+.hdr h1{font-size:21px;font-weight:800;letter-spacing:.1em;text-shadow:0 1px 0 rgba(255,255,255,.6);margin-bottom:3px}
+.hdr .wk{font-size:12px;color:#5a5450}
+.hdr .wn{font-size:11px;color:#2a9d8f;font-weight:700;margin-top:2px}
+.gpill{display:inline-block;margin-top:8px;background:rgba(255,255,255,.55);border:1px solid rgba(42,157,143,.35);color:#1a6e65;font-size:12px;padding:4px 13px;border-radius:999px;max-width:92%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;backdrop-filter:blur(4px)}
+
+/* ── 新週バナー ── */
+.nwb{background:rgba(42,157,143,.1);border:1px solid rgba(42,157,143,.28);border-radius:11px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#1a6e65;display:flex;align-items:center;gap:9px;animation:up .4s ease}
+
+/* ── 目標パネル ── */
+.gp{background:rgba(252,249,243,.92);border-radius:14px;margin-bottom:13px;box-shadow:0 4px 20px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.05);overflow:hidden}
+.gp-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;cursor:pointer;font-size:13px;font-weight:700;color:#2a9d8f;user-select:none}
+.gp-hdr .hint{font-size:10px;font-weight:400;color:#bbb;margin-left:6px}
+.gp-arr{font-size:11px;color:#bbb;transition:transform .25s}
+.gp-arr.open{transform:rotate(180deg)}
+.gp-body{padding:0 13px 13px;display:none}
+.gp-body.show{display:block}
+.gp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.gp-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;padding:2px 7px;border-radius:999px;display:inline-block}
+.gp-lbl.s{background:rgba(42,157,143,.13);color:#1a7068}
+.gp-lbl.m{background:rgba(108,99,255,.13);color:#4a42b0}
+.gp-lbl.l{background:rgba(233,93,28,.13);color:#a04010}
+.gp-lbl em{font-size:9px;font-style:normal;font-weight:400;opacity:.7;margin-left:3px}
+.gp-ta{width:100%;font-size:12px;padding:7px 9px;border:1.5px solid #e0d9d0;border-radius:8px;background:rgba(255,255,255,.6);resize:none;font-family:inherit;color:#1a1a1a;line-height:1.5}
+.gp-ta:focus{border-color:#2a9d8f;background:#fff;outline:none}
+
+/* ── ステップドット ── */
+.dots{display:flex;justify-content:center;gap:7px;margin-bottom:15px}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(26,26,26,.18);transition:all .3s}
+.dot.active{background:#1a1a1a;transform:scale(1.5)}
+.dot.done{background:rgba(26,26,26,.45)}
+
+/* ── カード ── */
+.card{background:rgba(252,249,243,.93);border-radius:3px 18px 18px 18px;padding:24px 22px;box-shadow:0 2px 4px rgba(0,0,0,.05),0 10px 36px rgba(0,0,0,.1);border:1px solid rgba(0,0,0,.05);animation:up .3s ease;position:relative}
+.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:44px;background:#2a9d8f;border-radius:3px 0 0 0}
+@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.tag{font-size:10px;font-weight:700;letter-spacing:.1em;color:#2a9d8f;text-transform:uppercase;margin-bottom:7px}
+.card h2{font-size:17px;font-weight:700;line-height:1.55;margin-bottom:14px}
+
+/* ── 先週参照ボックス ── */
+.lwb{background:rgba(42,157,143,.07);border:1px solid rgba(42,157,143,.24);border-radius:10px;padding:10px 13px;margin-bottom:11px;font-size:13px;color:#1a6e65}
+.lwb .ll{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#2a9d8f;margin-bottom:2px}
+.lwb .ls{margin-top:5px;font-size:11px;color:#2a9d8f}
+
+/* ── はい/いいえ ── */
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:13px 0}
+.ynb{padding:13px;border:2px solid #e0d9d0;border-radius:12px;background:rgba(255,255,255,.65);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;color:#bbb;text-align:center}
+.ynb:not(.on):hover{border-color:#888;color:#555}
+.ynb.y.on{background:#2a9d8f;border-color:#2a9d8f;color:#fff}
+.ynb.n.on{background:#1a1a1a;border-color:#1a1a1a;color:#fff}
+
+/* ── 分岐セクション ── */
+.branch{border-top:1px solid #ede8e0;margin-top:13px;padding-top:13px}
+.btitle{font-size:13px;font-weight:600;color:#444;margin-bottom:11px}
+
+/* ── 要因グループ ── */
+.fg{margin-bottom:11px}
+.fgl{font-size:11px;font-weight:700;color:#7a7470;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.fgl.num::before{content:'';display:inline-block;width:3px;height:13px;background:#2a9d8f;border-radius:2px;flex-shrink:0}
+
+/* ── チップ ── */
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{padding:6px 11px;border:1.5px solid #e0d9d0;border-radius:999px;background:rgba(255,255,255,.65);font-size:12px;color:#666;cursor:pointer;font-family:inherit;transition:all .18s}
+.chip:hover:not(.on){border-color:#2a9d8f;color:#2a9d8f}
+.chip.on{background:#2a9d8f;border-color:#2a9d8f;color:#fff}
+.chip.sm{font-size:11px;padding:4px 9px}
+.chip.cat{font-size:14px;font-weight:700;padding:9px 18px;border-radius:10px}
+.chip.cat.cs.on{background:#2a9d8f;border-color:#2a9d8f;color:#fff}
+.chip.cat.cm.on{background:#6c63ff;border-color:#6c63ff;color:#fff}
+.chip.cat.cl.on{background:#e95d1c;border-color:#e95d1c;color:#fff}
+
+/* ── 対策ボックス ── */
+.adv{background:rgba(42,157,143,.07);border:1px solid rgba(42,157,143,.22);border-radius:9px;padding:11px 13px;margin-top:7px}
+.adv-t{font-size:12px;font-weight:700;color:#1a7068;margin-bottom:5px}
+.adv p{font-size:13px;line-height:1.7;color:#333}
+.adv ul{padding-left:15px}
+.adv li{font-size:13px;line-height:1.7;color:#333;margin-bottom:2px}
+
+/* ── 目標レビュー(Q3) ── */
+.gr-item{margin-bottom:9px}
+.gr-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;padding:2px 7px;border-radius:999px;display:inline-block}
+.gr-lbl.s{background:rgba(42,157,143,.13);color:#1a7068}
+.gr-lbl.m{background:rgba(108,99,255,.13);color:#4a42b0}
+.gr-lbl.l{background:rgba(233,93,28,.13);color:#a04010}
+
+/* ── テキスト入力 ── */
+input[type=text],input[type=password],textarea{width:100%;padding:10px 12px;border:1.5px solid #e0d9d0;border-radius:10px;font-size:14px;font-family:inherit;outline:none;background:rgba(255,255,255,.65);color:#1a1a1a;resize:vertical;transition:border-color .2s,background .2s}
+input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:#2a9d8f;background:#fff}
+::placeholder{color:#c0b9b0}
+.fl{font-size:12px;color:#8a8480;margin-bottom:5px;margin-top:10px}
+
+/* ── アラート ── */
+.alert{display:none;margin-top:8px;background:#fff8f0;border:1px solid #ffcc80;border-radius:7px;padding:7px 11px;font-size:12px;color:#8d6e63}
+
+/* ── ボタン ── */
+.br{display:flex;gap:9px;margin-top:18px}
+.bp{flex:1;padding:13px;background:#1a1a1a;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
+.bp:hover{background:#2a9d8f;transform:translateY(-1px);box-shadow:0 6px 18px rgba(42,157,143,.28)}
+.bs{padding:13px 16px;background:transparent;color:#8a8480;border:1.5px solid #ddd8d0;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s}
+.bs:hover{border-color:#2a9d8f;color:#2a9d8f}
+
+/* ── 結果:全体スコア ── */
+.ob{display:flex;align-items:center;gap:15px;padding:19px;background:#1a1a1a;border-radius:14px;color:#fff;margin-bottom:18px}
+.ob .big{font-size:55px;font-weight:800;line-height:1}
+.ob .pct{font-size:17px;color:#56bdb4}
+.ob .sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px}
+.ob .side{flex:1}
+.ob .side .pw{background:rgba(255,255,255,.15);height:8px;margin-bottom:4px}
+.ob .side .lbl{font-size:11px;color:rgba(255,255,255,.4)}
+
+/* ── 週比較 ── */
+.wc{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}
+.wcb{background:rgba(255,255,255,.55);border:1.5px solid #e0d9d0;border-radius:12px;padding:11px 13px}
+.wcb.cur{border-color:rgba(42,157,143,.4)}
+.wcb .wl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#aaa;margin-bottom:6px}
+.wcb.cur .wl{color:#2a9d8f}
+.wrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.wrow .wlb{font-size:12px;color:#888}
+.wrow .wv{font-size:12px;font-weight:700}
+.wrow .wv.ok{color:#2a9d8f}.wrow .wv.ng{color:#e95d1c}.wrow .wv.na{color:#bbb}
+.trend{font-size:12px;font-weight:700}
+.trend.up{color:#2a9d8f}.trend.dn{color:#e95d1c}.trend.eq{color:#888}
+
+/* ── セクション ── */
+.rs{margin-bottom:18px}
+.rs h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#9a948e;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #ede8e0}
+
+/* ── 反省ブロック ── */
+.rb{background:rgba(255,255,255,.5);border-left:3px solid #2a9d8f;border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:7px}
+.rb .rl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#2a9d8f;margin-bottom:3px}
+.rb .rv{font-size:14px;line-height:1.75;color:#3a3a3a;white-space:pre-wrap}
+
+/* ── チップタグ(結果) ── */
+.ctags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.ctag{padding:3px 9px;border-radius:999px;background:rgba(42,157,143,.12);color:#1a7068;font-size:12px}
+.ctag.warn{background:rgba(233,93,28,.1);color:#a04010}
+
+/* ── プログレスバー ── */
+.pw{background:#ede8e0;border-radius:999px;height:7px;overflow:hidden;margin-bottom:4px}
+.pb{height:100%;background:linear-gradient(90deg,#2a9d8f,#56bdb4);border-radius:999px;transition:width .55s cubic-bezier(.4,0,.2,1)}
+
+/* ── GPT ── */
+.gpt-btn{width:100%;padding:13px;background:#1a1a1a;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.gpt-btn:hover{background:#2a9d8f}
+.gpt-btn:disabled{opacity:.6;cursor:not-allowed}
+.gpt-box{margin-top:11px;background:rgba(255,255,255,.5);border:1.5px solid rgba(26,26,26,.1);border-radius:12px;padding:15px}
+.gpt-box h4{font-size:13px;font-weight:700;color:#1a1a1a;margin:11px 0 4px}
+.gpt-box h4:first-child{margin-top:0}
+.gpt-box p{font-size:14px;line-height:1.75;color:#3a3a3a;margin-bottom:3px}
+.gpt-box ul{padding-left:15px;margin-bottom:4px}
+.gpt-box li{font-size:14px;line-height:1.75;color:#3a3a3a;margin-bottom:2px}
+.gpt-hint{font-size:12px;color:#aaa;text-align:center;margin-top:7px}
+.gpt-hint a{color:#2a9d8f;cursor:pointer;text-decoration:underline}
+
+/* ── エンドボタン ── */
+.eb{display:grid;gap:8px;margin-top:14px}
+.e-pr{padding:12px;background:transparent;color:#8a8480;border:1.5px solid #ddd8d0;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.e-rs{padding:13px;background:#1a1a1a;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.e-rs:hover{background:#2a9d8f}
+
+/* ── スピナー ── */
+.spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:rot .75s linear infinite;flex-shrink:0}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* ── 設定モーダル ── */
+.cfg-btn{position:fixed;top:13px;right:13px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.65);border:1px solid rgba(0,0,0,.1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;z-index:200;backdrop-filter:blur(4px)}
+.s-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:center;justify-content:center;padding:18px}
+.s-mo{background:#faf6f0;border-radius:18px;padding:24px 20px;width:100%;max-width:380px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.s-mo h3{font-size:16px;font-weight:700;margin-bottom:12px}
+.s-note{font-size:11px;color:#999;margin-top:6px;line-height:1.6}
+
+/* ── モバイル ── */
+@media(max-width:520px){
+  .card{padding:19px 15px}
+  .gp-grid{grid-template-columns:1fr}
+  .wc{grid-template-columns:1fr}
+  .ob .big{font-size:44px}
+}
+
+/* ── 印刷/PDF ── */
+@media print{
+  @page{size:A4;margin:13mm 17mm}
+  body{background:#fff!important;padding:0;color:#000}
+  .bg,.cfg-btn,.eb,.gpt-btn,.dots,.br,.nwb{display:none!important}
+  .gp,.card{box-shadow:none;border:1px solid #ccc;margin-bottom:7mm;animation:none;break-inside:avoid}
+  .gp-body{display:block!important}
+  .rs{break-inside:avoid}
+  .rb,.adv,.wcb{break-inside:avoid}
+  .page-break{break-before:page}
+  .chip.on{background:transparent!important;color:#1a7068!important;border-color:#2a9d8f!important}
+  .chip.on::before{content:"☑ "}
+  .gpt-box{border:1px solid #ccc}
+  .gp-grid{grid-template-columns:repeat(3,1fr)!important}
+  /* 2カラムチップ */
+  .p2c .chips{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg" aria-hidden="true">
+  <canvas id="bgC"></canvas>
+  <div class="bg-ts"></div><div class="bg-tb"></div><div class="bg-td"></div>
+</div>
+
+<button class="cfg-btn" onclick="openCfg()" title="設定">⚙</button>
+
+<div class="s-ov" id="cfgOv" style="display:none" onclick="cfgOut(event)">
+  <div class="s-mo">
+    <h3>設定</h3>
+    <div class="fl">OpenAI APIキー（GPTフィードバック用）</div>
+    <input type="password" id="apiKey" placeholder="sk-...">
+    <div class="s-note">キーはブラウザの localStorage に保存されます。GPT-4o-mini を使用します（1回あたり約0.001〜0.003ドル）。</div>
+    <div class="br" style="margin-top:14px">
+      <button class="bs" onclick="closeCfg()">閉じる</button>
+      <button class="bp" onclick="saveCfg()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="hdr">
+    <h1>週次振り返りシート</h1>
+    <div id="wkLbl" class="wk"></div>
+    <div id="wkNum" class="wn"></div>
+    <div id="gpill"></div>
+  </div>
+
+  <div class="nwb" id="nwBanner" style="display:none">
+    <span style="font-size:18px;flex-shrink:0">🗓</span>
+    <div><strong>新しい週が始まりました！</strong><br>先週の振り返りをもとに、今週も一歩ずつ前進しましょう。</div>
+  </div>
+
+  <!-- 目標パネル（常時表示・常に編集可） -->
+  <div class="gp" id="gpPanel">
+    <div class="gp-hdr" onclick="toggleGP()">
+      <span>📌 目標一覧<span class="hint">（いつでも編集できます）</span></span>
+      <span class="gp-arr open" id="gpArr">▲</span>
+    </div>
+    <div class="gp-body show" id="gpBody">
+      <div class="gp-grid">
+        <div>
+          <div class="gp-lbl s">短期<em>1ヶ月以内</em></div>
+          <textarea class="gp-ta" id="gShort" rows="2" placeholder="例：毎日30分の学習習慣を確立する" oninput="saveGoals()"></textarea>
+        </div>
+        <div>
+          <div class="gp-lbl m">中期<em>3〜6ヶ月</em></div>
+          <textarea class="gp-ta" id="gMid" rows="2" placeholder="例：○○の資格を取得する" oninput="saveGoals()"></textarea>
+        </div>
+        <div>
+          <div class="gp-lbl l">長期<em>1年以上</em></div>
+          <textarea class="gp-ta" id="gLong" rows="2" placeholder="例：○○分野のエキスパートになる" oninput="saveGoals()"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dots" id="dotsEl"></div>
+  <div id="app"></div>
+</div>
+
+<script>
+// ══════════════════════════════════
+// 設定データ（ここを編集して質問をカスタマイズ）
+// ══════════════════════════════════
+const F = {
+  env    : ['場所を変えた','スマホを隔離した','雑音がなかった','集中できる環境を整えた'],
+  body   : ['睡眠が十分だった','昼寝がうまくいった','食事のタイミングが良かった','体調が良好だった'],
+  content: ['タスクの粒度が適切だった','優先順位が適切だった','予想より簡単で時間がかからなかった','集中が続いた'],
+  est    : ['予定を詰め込み過ぎた','一つのタスクに想定以上の時間がかかった'],
+  ext    : ['急な用事が入った','予期せぬ割り込みがあった'],
+  int    : ['スマホ・SNSを見てしまった','眠気・疲れで集中できなかった','悩み事・不安で集中できなかった'],
+  nenv   : ['場所を変えなかった','スマホを隔離しなかった','雑音が多かった','集中できる環境を整えなかった'],
+  nbody  : ['睡眠が不十分だった','昼寝がうまくいかなかった','食事のタイミングが悪かった','体調が優れなかった'],
+  ncont  : ['タスクの粒度が大きすぎた','優先順位が曖昧だった','予想より難しく時間がかかった','集中が途切れがちだった']
+};
+
+const ADV = {
+  est:{ t:'① 見積もりミスへの対策', p:'週・月単位（短期・中期）の配分を見直し、バッファーを考慮して再設計する。タスクごとに「最低〜最大時間」の幅を持たせると効果的です。' },
+  ext:{ t:'② 外的な邪魔への対策',   p:'週単位のバッファーで帳尻を合わせる。毎週の計画に「バッファ枠（2〜3時間）」を確保しておくと急な予定も吸収できます。' },
+  int:{ t:'③ 内的な邪魔への対策', bullets:['要因を排除し、学習環境を再整備する（スマホを別室へ / 耳栓をする / 不安を書き出す）','体調管理を見直す（食事内容・時間を見直す / 散歩時間を増やすなど）'] }
+};
+
+// ══════════════════════════════════
+// 状態管理
+// ══════════════════════════════════
+let S = fresh();
+function fresh() {
+  return { step:0, weeklyGoal:'', q1:null, q1env:[], q1body:[], q1cont:[], q1other:'', q2:null, q2est:[], q2ext:[], q2int:[], q2neg:[], q2other:'', q3:null, q3txt:'', q3cats:[], nextGoal:'', gptFb:null, gptLoading:false };
+}
+const STEP_RES = 5;
+
+// ══════════════════════════════════
+// LocalStorage
+// ══════════════════════════════════
+const LS = {
+  goals()   { try { return JSON.parse(localStorage.getItem('rf_goals')||'{}'); } catch { return {}; } },
+  setGoals(g){ localStorage.setItem('rf_goals', JSON.stringify(g)); },
+  hist()    { try { return JSON.parse(localStorage.getItem('rf_hist')||'[]'); } catch { return []; } },
+  push(e)   { const h=LS.hist(); h.unshift(e); localStorage.setItem('rf_hist',JSON.stringify(h.slice(0,52))); },
+  last()    { return LS.hist()[0]||null; },
+  curWk()   { return localStorage.getItem('rf_wk')||''; },
+  setWk(k)  { localStorage.setItem('rf_wk',k); },
+  key()     { return localStorage.getItem('oai_key')||''; }
+};
+
+function wkKey(d) {
+  d=d||new Date();
+  const jan1=new Date(d.getFullYear(),0,1);
+  const w=Math.ceil(((d-jan1)/86400000+jan1.getDay()+1)/7);
+  return `${d.getFullYear()}-W${String(w).padStart(2,'0')}`;
+}
+function wkLabel() {
+  const now=new Date(),day=now.getDay();
+  const mon=new Date(now); mon.setDate(now.getDate()-(day===0?6:day-1));
+  const sun=new Date(mon); sun.setDate(mon.getDate()+6);
+  const f=d=>`${d.getMonth()+1}/${d.getDate()}`;
+  return `${now.getFullYear()}年 ${f(mon)}（月）〜 ${f(sun)}（日）`;
+}
+function wkNum() { const k=wkKey(); const m=k.match(/W(\d+)/); return m?`第${+m[1]}週`:''; }
+
+// ══════════════════════════════════
+// スコア計算
+// ══════════════════════════════════
+function score(d) {
+  d=d||S; let s=0;
+  if (d.q1===true)  { s+=40; const n=[...(d.q1env||[]),...(d.q1body||[]),...(d.q1cont||[])].length; s+=n>=3?15:n>=1?8:0; }
+  else if (d.q1===false) s+=10; else s+=15;
+  if (d.q2===false) s+=35;
+  else if (d.q2===true) { const n=[...(d.q2est||[]),...(d.q2ext||[]),...(d.q2int||[])].length; s+=n>0?20:5; }
+  else s+=15;
+  if (d.q3===true) s+=(d.q3cats||[]).length>0?10:5;
+  return Math.min(100,Math.round(s));
+}
+
+// ══════════════════════════════════
+// ユーティリティ
+// ══════════════════════════════════
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+const $ = id => document.getElementById(id);
+
+function toggleChip(btn, key, val) {
+  const arr=S[key], i=arr.indexOf(val);
+  if(i>=0){arr.splice(i,1);btn.classList.remove('on');}else{arr.push(val);btn.classList.add('on');}
+  if(['q2est','q2ext','q2int'].includes(key)) updAdvice();
+}
+
+// ══════════════════════════════════
+// 目標パネル
+// ══════════════════════════════════
+let gpOpen=true;
+function toggleGP(){
+  gpOpen=!gpOpen;
+  $('gpBody').classList.toggle('show',gpOpen);
+  $('gpArr').classList.toggle('open',gpOpen);
+  $('gpArr').textContent=gpOpen?'▲':'▼';
+}
+function saveGoals(){ LS.setGoals({short:$('gShort')?.value||'',medium:$('gMid')?.value||'',long:$('gLong')?.value||''}); }
+function loadGoals(){ const g=LS.goals(); if($('gShort'))$('gShort').value=g.short||''; if($('gMid'))$('gMid').value=g.medium||''; if($('gLong'))$('gLong').value=g.long||''; }
+function updateGoal(key,val){ const g=LS.goals(); g[key]=val; LS.setGoals(g); }
+
+// ══════════════════════════════════
+// レンダリング
+// ══════════════════════════════════
+function renderDots(){
+  $('dotsEl').innerHTML=Array.from({length:5},(_,i)=>{
+    let c='dot'; if(i===S.step)c+=' active'; else if(i<S.step)c+=' done';
+    return `<div class="${c}"></div>`;
+  }).join('');
+}
+function renderPill(){
+  $('gpill').innerHTML=(S.step>=1&&S.weeklyGoal.trim())?`<span class="gpill">目標：${esc(S.weeklyGoal)}</span>`:'';
+}
+
+// ─── Step 0: 今週の目標 ───
+function rS0(){
+  const lw=LS.last();
+  if(!S.weeklyGoal&&lw?.nextGoal) S.weeklyGoal=lw.nextGoal;
+  const lwHtml=lw?`<div class="lwb"><div class="ll">先週の目標</div>${esc(lw.weeklyGoal)}${lw.nextGoal?`<div class="ls">来週の計画（先週入力）：${esc(lw.nextGoal)}</div>`:''}</div>`:'';
+  const advHtml=lw?.q2adv?`<div class="adv" style="margin-bottom:10px"><div class="adv-t">先週の改善提案（今週も意識しましょう）</div><p>${esc(lw.q2adv)}</p></div>`:'';
+  return `<div class="card">
+    <div class="tag">Step 1 / 5 — 今週の目標</div>
+    <h2>今週の目標を入力してください</h2>
+    ${lwHtml}${advHtml}
+    <input type="text" id="gIn" maxlength="80" placeholder="例：毎日30分の学習を継続する" value="${esc(S.weeklyGoal)}">
+    <div class="alert" id="gAl">目標を入力してください</div>
+    <div class="br"><button class="bp" onclick="go0()">次へ →</button></div>
+  </div>`;
+}
+
+// ─── Step 1: Q1 目標達成？ ───
+function rS1(){
+  const y=S.q1===true, n=S.q1===false;
+  // stateKey = S[stateKey] の配列キー, fKey = F[fKey] の選択肢キー（別々に持つ）
+  const chips=(arr, stateKey, fKey)=>F[fKey].map(f=>`<button class="chip${arr.includes(f)?' on':''}" onclick="toggleChip(this,'${stateKey}','${esc(f)}')">${esc(f)}</button>`).join('');
+  const branch=y?`<div class="branch">
+    <div class="btitle">それはなぜ？（当てはまるものをクリック、複数OK）</div>
+    <div class="fg p2c"><div class="fgl">環境面</div><div class="chips">${chips(S.q1env,'q1env','env')}</div></div>
+    <div class="fg p2c"><div class="fgl">体調面</div><div class="chips">${chips(S.q1body,'q1body','body')}</div></div>
+    <div class="fg p2c"><div class="fgl">内容面</div><div class="chips">${chips(S.q1cont,'q1cont','content')}</div></div>
+    <div class="fl">その他</div><textarea id="q1oth" rows="2" placeholder="その他うまくいった理由…">${esc(S.q1other)}</textarea>
+  </div>`:'';
+  return `<div class="card">
+    <div class="tag">Q 1 / 3 — 目標達成</div>
+    <h2>今週の目標は概ね達成できましたか？</h2>
+    <div class="yn"><button class="ynb y${y?' on':''}" onclick="setQ1(true)">✓ はい</button><button class="ynb n${n?' on':''}" onclick="setQ1(false)">✗ いいえ</button></div>
+    ${branch}
+    <div class="alert" id="q1Al">選択してください</div>
+    <div class="br"><button class="bs" onclick="goBack()">← 戻る</button><button class="bp" onclick="go1()">次へ →</button></div>
+  </div>`;
+}
+
+// ─── Step 2: Q2 計画崩れ？ ───
+function rS2(){
+  const y=S.q2===true, n=S.q2===false;
+  const neg=[...F.nenv,...F.nbody,...F.ncont];
+  const branch=y?`<div class="branch">
+    <div class="btitle">崩れた原因は？（複数OK）</div>
+    <div class="fg"><div class="fgl num">① 見積もりミス</div><div class="chips">${F.est.map(f=>`<button class="chip${S.q2est.includes(f)?' on':''}" onclick="toggleChip(this,'q2est','${esc(f)}')">${esc(f)}</button>`).join('')}</div></div>
+    <div class="fg"><div class="fgl num">② 外的な邪魔</div><div class="chips">${F.ext.map(f=>`<button class="chip${S.q2ext.includes(f)?' on':''}" onclick="toggleChip(this,'q2ext','${esc(f)}')">${esc(f)}</button>`).join('')}</div></div>
+    <div class="fg"><div class="fgl num">③ 内的な邪魔</div><div class="chips">${F.int.map(f=>`<button class="chip${S.q2int.includes(f)?' on':''}" onclick="toggleChip(this,'q2int','${esc(f)}')">${esc(f)}</button>`).join('')}</div></div>
+    <div class="fg"><div class="fgl">その他・環境／体調要因</div><div class="chips">${neg.map(f=>`<button class="chip sm${S.q2neg.includes(f)?' on':''}" onclick="toggleChip(this,'q2neg','${esc(f)}')">${esc(f)}</button>`).join('')}</div>
+    <div class="fl">自由記述</div><textarea id="q2oth" rows="2" placeholder="その他の原因…">${esc(S.q2other)}</textarea></div>
+    <div id="advZone"><div style="font-size:13px;color:#bbb;margin-top:8px">選択すると対策が表示されます</div></div>
+  </div>`:'';
+  return `<div class="card">
+    <div class="tag">Q 2 / 3 — 計画崩れ</div>
+    <h2>一つでも崩れた計画はありましたか？</h2>
+    <div class="yn"><button class="ynb y${y?' on':''}" onclick="setQ2(true)">あり</button><button class="ynb n${n?' on':''}" onclick="setQ2(false)">なし</button></div>
+    ${branch}
+    <div class="alert" id="q2Al">選択してください</div>
+    <div class="br"><button class="bs" onclick="goBack()">← 戻る</button><button class="bp" onclick="go2()">次へ →</button></div>
+  </div>`;
+}
+
+// ─── Step 3: Q3 新たな気づき ───
+function rS3(){
+  const y=S.q3===true, n=S.q3===false;
+  const g=LS.goals();
+  const catMap={短期:{k:'short',cs:'s'},中期:{k:'medium',cs:'m'},長期:{k:'long',cs:'l'}};
+  const goalsEdit=S.q3cats.length?`<div style="margin-top:12px"><div class="fl">対応する目標を確認・修正</div>${S.q3cats.map(cat=>{const{k,cs}=catMap[cat];return `<div class="gr-item"><div class="gr-lbl ${cs}">${cat}目標</div><textarea class="gp-ta" rows="2" oninput="updateGoal('${k}',this.value)">${esc(g[k]||'')}</textarea></div>`;}).join('')}</div>`:'';
+  const branch=y?`<div class="branch">
+    <div class="fl" style="margin-top:0">どのような「やるべきこと」が見えてきましたか？</div>
+    <textarea id="q3txt" rows="3" placeholder="例：毎朝10分の計画確認を習慣にする">${esc(S.q3txt)}</textarea>
+    <div class="fl" style="margin-top:12px">これは以下のどれに当てはまりますか？（複数OK）</div>
+    <div class="chips" style="gap:8px">
+      <button class="chip cat cs${S.q3cats.includes('短期')?' on':''}" onclick="toggleChip(this,'q3cats','短期')">短期目標</button>
+      <button class="chip cat cm${S.q3cats.includes('中期')?' on':''}" onclick="toggleChip(this,'q3cats','中期')">中期目標</button>
+      <button class="chip cat cl${S.q3cats.includes('長期')?' on':''}" onclick="toggleChip(this,'q3cats','長期')">長期目標</button>
+    </div>
+    ${goalsEdit}
+  </div>`:'';
+  return `<div class="card">
+    <div class="tag">Q 3 / 3 — 新たな気づき</div>
+    <h2>振り返りの中で、新たに見えてきた「やるべきこと」はありますか？</h2>
+    <div class="yn"><button class="ynb y${y?' on':''}" onclick="setQ3(true)">あり</button><button class="ynb n${n?' on':''}" onclick="setQ3(false)">なし</button></div>
+    ${branch}
+    <div class="alert" id="q3Al">選択してください</div>
+    <div class="br"><button class="bs" onclick="goBack()">← 戻る</button><button class="bp" onclick="go3()">次へ →</button></div>
+  </div>`;
+}
+
+// ─── Step 4: 来週の目標 ───
+function rS4(){
+  const hints=[];
+  if(S.q2est.length) hints.push(ADV.est.p);
+  if(S.q2ext.length) hints.push(ADV.ext.p);
+  if(S.q2int.length) hints.push(ADV.int.bullets.join(' / '));
+  const hintHtml=hints.length?`<div class="adv" style="margin-bottom:11px"><div class="adv-t">今週の振り返りから来週に活かすヒント</div><ul>${hints.map(h=>`<li>${esc(h)}</li>`).join('')}</ul></div>`:'';
+  return `<div class="card">
+    <div class="tag">Step 5 / 5 — 来週の目標</div>
+    <h2>来週の目標を設定しましょう</h2>
+    <div class="lwb"><div class="ll">今週の目標（参照）</div>${esc(S.weeklyGoal)}</div>
+    ${hintHtml}
+    <div class="fl">来週の具体的な目標（任意）</div>
+    <textarea id="ngIn" rows="3" placeholder="例：毎日30分の学習を維持しつつ、SNS時間を制限するルールを1週間試す">${esc(S.nextGoal)}</textarea>
+    <div class="br"><button class="bs" onclick="goBack()">← 戻る</button><button class="bp" onclick="go4()">結果を見る →</button></div>
+  </div>`;
+}
+
+// ─── Step 5: 結果 ───
+function rRes(){
+  const sc=score(), lw=LS.last(), lwSc=lw?score(lw):null, g=LS.goals();
+
+  const cmpHtml=lw?`<div class="wc">
+    <div class="wcb"><div class="wl">先週 ${lw.wk||''}</div>
+      <div class="wrow"><span class="wlb">目標達成</span><span class="wv ${lw.q1===true?'ok':'ng'}">${lw.q1===true?'✓ 達成':'✗ 未達'}</span></div>
+      <div class="wrow"><span class="wlb">計画崩れ</span><span class="wv ${lw.q2===false?'ok':'ng'}">${lw.q2===false?'なし':'あり'}</span></div>
+      <div class="wrow"><span class="wlb">新たな気づき</span><span class="wv na">${lw.q3?'あり':'なし'}</span></div>
+      <div class="wrow"><span class="wlb">スコア</span><span class="wv">${lwSc}点</span></div>
+    </div>
+    <div class="wcb cur"><div class="wl">今週</div>
+      <div class="wrow"><span class="wlb">目標達成</span><span class="wv ${S.q1===true?'ok':'ng'}">${S.q1===true?'✓ 達成':'✗ 未達'}</span></div>
+      <div class="wrow"><span class="wlb">計画崩れ</span><span class="wv ${S.q2===false?'ok':'ng'}">${S.q2===false?'なし':'あり'}</span></div>
+      <div class="wrow"><span class="wlb">新たな気づき</span><span class="wv na">${S.q3?'あり':'なし'}</span></div>
+      <div class="wrow"><span class="wlb">スコア</span><span class="wv">${sc}点 <span class="trend ${sc>lwSc?'up':sc<lwSc?'dn':'eq'}">${sc>lwSc?'↑':sc<lwSc?'↓':'→'}</span></span></div>
+    </div>
+  </div>`:'';
+
+  const q1f=[...S.q1env,...S.q1body,...S.q1cont];
+  const q1Html=`<div class="rs">
+    <h3>Q1 — 目標達成の振り返り</h3>
+    <div class="rb"><div class="rl">結果</div><div class="rv">${S.q1===true?'✓ 概ね達成できた':'✗ 未達だった'}</div></div>
+    ${S.q1===true&&q1f.length?`<div class="rb"><div class="rl">うまくいった要因</div><div class="ctags">${q1f.map(f=>`<span class="ctag">${esc(f)}</span>`).join('')}</div></div>`:''}
+    ${S.q1other?`<div class="rb"><div class="rl">その他</div><div class="rv">${esc(S.q1other)}</div></div>`:''}
+  </div>`;
+
+  const q2r=[...S.q2est,...S.q2ext,...S.q2int];
+  const q2Html=`<div class="rs page-break">
+    <h3>Q2 — 計画崩れの分析</h3>
+    ${S.q2===false?`<div class="rb"><div class="rv">✓ 計画通り実行できた</div></div>`:''}
+    ${S.q2===true?`
+      <div class="rb"><div class="rl">崩れの原因</div><div class="ctags">${[...q2r,...S.q2neg].map(f=>`<span class="ctag warn">${esc(f)}</span>`).join('')||'<span style="color:#bbb;font-size:13px">未選択</span>'}</div></div>
+      ${S.q2est.length?`<div class="adv"><div class="adv-t">${ADV.est.t}</div><p>${esc(ADV.est.p)}</p></div>`:''}
+      ${S.q2ext.length?`<div class="adv"><div class="adv-t">${ADV.ext.t}</div><p>${esc(ADV.ext.p)}</p></div>`:''}
+      ${S.q2int.length?`<div class="adv"><div class="adv-t">${ADV.int.t}</div><ul>${ADV.int.bullets.map(b=>`<li>${esc(b)}</li>`).join('')}</ul></div>`:''}
+      ${S.q2other?`<div class="rb" style="margin-top:8px"><div class="rl">その他メモ</div><div class="rv">${esc(S.q2other)}</div></div>`:''}
+    `:''}
+  </div>`;
+
+  const q3Html=`<div class="rs">
+    <h3>Q3 — 新たな気づき</h3>
+    ${S.q3===true?`
+      <div class="rb"><div class="rl">やるべきこと</div><div class="rv">${esc(S.q3txt)||'（記述なし）'}</div></div>
+      ${S.q3cats.length?`<div class="rb"><div class="rl">分類</div><div class="ctags">${S.q3cats.map(c=>`<span class="ctag">${esc(c)}目標</span>`).join('')}</div></div>`:''}`
+    :`<div class="rb"><div class="rv">特になし</div></div>`}
+  </div>`;
+
+  const goalsHtml=(g.short||g.medium||g.long)?`<div class="rs">
+    <h3>短期・中期・長期 目標</h3>
+    ${g.short?`<div class="rb"><div class="rl">短期</div><div class="rv">${esc(g.short)}</div></div>`:''}
+    ${g.medium?`<div class="rb"><div class="rl">中期</div><div class="rv">${esc(g.medium)}</div></div>`:''}
+    ${g.long?`<div class="rb"><div class="rl">長期</div><div class="rv">${esc(g.long)}</div></div>`:''}
+  </div>`:'';
+
+  const nwHtml=S.nextGoal?`<div class="rs"><h3>来週の目標</h3><div class="rb"><div class="rv">${esc(S.nextGoal)}</div></div></div>`:'';
+
+  return `<div class="card">
+    <div class="tag">今週の振り返り結果</div>
+    <div class="ob">
+      <div><div class="big">${sc}</div><div class="pct">点</div><div class="sub">/ 100点満点</div></div>
+      <div class="side"><div class="pw"><div class="pb" style="width:${sc}%"></div></div><div class="lbl">今週のスコア${lwSc!==null?` （先週 ${lwSc}点）`:'（初回）'}</div></div>
+    </div>
+    ${cmpHtml}${q1Html}${q2Html}${q3Html}${goalsHtml}${nwHtml}
+    <div class="eb">
+      <button class="e-pr" onclick="doPrint()">📄 PDFとして保存</button>
+      <button class="e-rs" onclick="restart()">新しい週を始める</button>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════
+// マウント
+// ══════════════════════════════════
+function mount(){
+  renderDots(); renderPill();
+  const app=$('app');
+  if(S.step===0)      app.innerHTML=rS0();
+  else if(S.step===1) app.innerHTML=rS1();
+  else if(S.step===2) app.innerHTML=rS2();
+  else if(S.step===3) app.innerHTML=rS3();
+  else if(S.step===4) app.innerHTML=rS4();
+  else                app.innerHTML=rRes();
+  bind();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function bind(){
+  if(S.step===0){ const e=$('gIn'); if(e){e.addEventListener('input',ev=>S.weeklyGoal=ev.target.value);e.focus();} }
+  if(S.step===1){ $('q1oth')?.addEventListener('input',ev=>S.q1other=ev.target.value); }
+  if(S.step===2){ $('q2oth')?.addEventListener('input',ev=>S.q2other=ev.target.value); if(S.q2===true) updAdvice(); }
+  if(S.step===3){ $('q3txt')?.addEventListener('input',ev=>S.q3txt=ev.target.value); }
+  if(S.step===4){ $('ngIn')?.addEventListener('input',ev=>S.nextGoal=ev.target.value); }
+}
+
+// ══════════════════════════════════
+// ナビゲーション
+// ══════════════════════════════════
+function showAl(id){ const e=$(id); if(e) e.style.display='block'; }
+function go0(){ if(!S.weeklyGoal.trim()){showAl('gAl');return;} S.step=1;mount(); }
+function go1(){ if(S.q1===null){showAl('q1Al');return;} S.step=2;mount(); }
+function go2(){ if(S.q2===null){showAl('q2Al');return;} S.step=3;mount(); }
+function go3(){ if(S.q3===null){showAl('q3Al');return;} S.step=4;mount(); }
+function go4(){
+  // 来週目標は任意 — バリデーションなし、必ず進める
+  const q2adv=[S.q2est.length?ADV.est.p:'',S.q2ext.length?ADV.ext.p:'',S.q2int.length?ADV.int.bullets.join(' / '):''].filter(Boolean).join('\n');
+  LS.push({ wk:wkKey(), weeklyGoal:S.weeklyGoal, q1:S.q1, q1env:S.q1env, q1body:S.q1body, q1cont:S.q1cont, q2:S.q2, q2est:S.q2est, q2ext:S.q2ext, q2int:S.q2int, q3:S.q3, q3txt:S.q3txt, q3cats:S.q3cats, nextGoal:S.nextGoal, q2adv, score:score(), at:new Date().toISOString() });
+  LS.setWk(wkKey());
+  S.step=STEP_RES; mount();
+}
+function goBack(){ if(S.step>0){S.step--;mount();} }
+
+function setQ1(v){ S.q1=v; $('q1Al')&&($('q1Al').style.display='none'); $('app').innerHTML=rS1(); bind(); }
+function setQ2(v){ S.q2=v; $('q2Al')&&($('q2Al').style.display='none'); $('app').innerHTML=rS2(); bind(); }
+function setQ3(v){ S.q3=v; $('q3Al')&&($('q3Al').style.display='none'); $('app').innerHTML=rS3(); bind(); }
+
+function updAdvice(){
+  const el=$('advZone'); if(!el) return;
+  const hE=S.q2est.length>0, hX=S.q2ext.length>0, hI=S.q2int.length>0;
+  if(!hE&&!hX&&!hI){ el.innerHTML='<div style="font-size:13px;color:#bbb;margin-top:8px">選択すると対策が表示されます</div>'; return; }
+  el.innerHTML=(hE?`<div class="adv"><div class="adv-t">${ADV.est.t}</div><p>${esc(ADV.est.p)}</p></div>`:'')+
+    (hX?`<div class="adv"><div class="adv-t">${ADV.ext.t}</div><p>${esc(ADV.ext.p)}</p></div>`:'')+
+    (hI?`<div class="adv"><div class="adv-t">${ADV.int.t}</div><ul>${ADV.int.bullets.map(b=>`<li>${esc(b)}</li>`).join('')}</ul></div>`:'');
+}
+
+function restart(){ S=fresh(); mount(); }
+
+// ══════════════════════════════════
+// GPT
+// ══════════════════════════════════
+function gptHTML(){
+  if(S.gptLoading) return `<div class="gpt-btn" style="cursor:default;pointer-events:none"><div class="spin"></div>GPTが振り返りを分析中…</div>`;
+  if(S.gptFb) return `<div class="gpt-box">${md(S.gptFb)}</div><button class="gpt-btn" onclick="fetchGPT()" style="margin-top:10px;background:#555;font-size:13px">↺ 再取得</button>`;
+  if(!LS.key()) return `<div class="gpt-hint" style="padding:10px 0">APIキーを設定するとフィードバックが自動表示されます — <a onclick="openCfg()">設定はこちら</a></div>`;
+  // キーあり・未取得（autoFetchが働かなかった場合のフォールバック）
+  return `<button class="gpt-btn" onclick="fetchGPT()">✦ GPTフィードバックを取得</button>`;
+}
+function updGPT(){ const el=$('gptZ'); if(el) el.innerHTML=gptHTML(); }
+
+function buildPrompt(){
+  const g=LS.goals();
+  return `あなたは目標達成・習慣形成コーチです。以下の週次振り返りを読み、温かく建設的なフィードバックを日本語で提供してください。
+【ルール】完璧主義を強めない／小さな前進を認める／改善提案は小さく始められるものにする／200字程度で簡潔に。
+
+今週の目標：${S.weeklyGoal}
+Q1達成：${S.q1===true?'達成':S.q1===false?'未達':'未回答'}
+Q1成功要因：${[...S.q1env,...S.q1body,...S.q1cont].join('、')||'なし'}
+Q2計画崩れ：${S.q2===false?'なし':S.q2===true?'あり':'未回答'}
+Q2原因：${[...S.q2est,...S.q2ext,...S.q2int].join('、')||'なし'}
+Q3新たな気づき：${S.q3===true?(S.q3txt||'あり'):'なし'}
+短期目標：${g.short||'未設定'} 中期：${g.medium||'未設定'} 長期：${g.long||'未設定'}
+来週の目標：${S.nextGoal||'未設定'}
+
+以下の形式で返答してください：
+## 今週の振り返り
+## 良かった点
+## 来週への提案
+## メッセージ`;
+}
+
+async function fetchGPT(){
+  const key=LS.key(); if(!key){openCfg();return;}
+  S.gptLoading=true; updGPT();
+  try {
+    const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'user',content:buildPrompt()}],max_tokens:600,temperature:0.75})});
+    if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'API error');}
+    const d=await r.json(); S.gptFb=d.choices[0].message.content;
+  } catch(e){ S.gptFb=`エラー：${e.message}\nAPIキーや残高をご確認ください。`; }
+  S.gptLoading=false; updGPT();
+}
+
+function md(txt){
+  let h='',ul=false;
+  for(const ln of txt.split('\n')){
+    if(ln.startsWith('## ')){if(ul){h+='</ul>';ul=false;}h+=`<h4>${esc(ln.slice(3))}</h4>`;}
+    else if(ln.startsWith('- ')){if(!ul){h+='<ul>';ul=true;}h+=`<li>${esc(ln.slice(2))}</li>`;}
+    else if(ln.trim()){if(ul){h+='</ul>';ul=false;}h+=`<p>${esc(ln)}</p>`;}
+  }
+  if(ul)h+='</ul>'; return h;
+}
+
+// ══════════════════════════════════
+// PDF保存
+// ══════════════════════════════════
+function doPrint(){
+  $('gpBody').classList.add('show');
+  $('gpArr').classList.add('open');
+  window.print();
+}
+
+// ══════════════════════════════════
+// 設定モーダル
+// ══════════════════════════════════
+function openCfg(){ $('apiKey').value=LS.key(); $('cfgOv').style.display='flex'; }
+function closeCfg(){ $('cfgOv').style.display='none'; }
+function cfgOut(e){ if(e.target===$('cfgOv')) closeCfg(); }
+function saveCfg(){ localStorage.setItem('oai_key',$('apiKey').value.trim()); closeCfg(); }
+
+// ══════════════════════════════════
+// 水彩背景キャンバス
+// ══════════════════════════════════
+function drawBg(){
+  const cv=$('bgC'),ctx=cv.getContext('2d');
+  const W=cv.width=window.innerWidth, H=cv.height=window.innerHeight;
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  for(let i=0;i<65;i++){ctx.beginPath();ctx.arc(rnd(0,W),rnd(0,H),rnd(.4,3.5),0,Math.PI*2);ctx.fillStyle=`rgba(18,13,8,${rnd(.06,.22)})`;ctx.fill();}
+  for(let i=0;i<22;i++){ctx.beginPath();ctx.arc(rnd(0,W),rnd(0,H),rnd(.8,4.5),0,Math.PI*2);ctx.fillStyle=`rgba(42,157,143,${rnd(.12,.38)})`;ctx.fill();}
+  for(let i=0;i<8;i++){const x=rnd(0,W),y0=rnd(0,55),y1=y0+rnd(25,110);ctx.beginPath();ctx.moveTo(x,y0);ctx.bezierCurveTo(x+rnd(-4,4),y0+30,x+rnd(-4,4),y1-20,x+rnd(-2,2),y1);ctx.strokeStyle=`rgba(18,13,8,${rnd(.07,.17)})`;ctx.lineWidth=rnd(.4,2.2);ctx.stroke();}
+  for(let i=0;i<4;i++){const x=rnd(W*.3,W*.85),y0=rnd(0,90),y1=y0+rnd(35,100);ctx.beginPath();ctx.moveTo(x,y0);ctx.bezierCurveTo(x+rnd(-3,3),y0+25,x+rnd(-3,3),y1-15,x+rnd(-2,2),y1);ctx.strokeStyle=`rgba(42,157,143,${rnd(.25,.45)})`;ctx.lineWidth=rnd(.8,2.8);ctx.stroke();}
+  for(let i=0;i<4;i++){const x=rnd(W*.05,W*.85),y=rnd(H*.8,H*.92),rx=rnd(18,55),ry=rnd(8,22);ctx.save();ctx.filter='blur(2px)';ctx.beginPath();ctx.ellipse(x,y,rx,ry,rnd(-.4,.4),0,Math.PI*2);ctx.fillStyle=`rgba(18,13,8,${rnd(.06,.13)})`;ctx.fill();ctx.restore();}
+}
+
+// ══════════════════════════════════
+// 初期化
+// ══════════════════════════════════
+(function init(){
+  $('wkLbl').textContent=wkLabel();
+  $('wkNum').textContent=wkNum();
+  // 新しい週の検出
+  const cur=wkKey();
+  if(LS.curWk()&&LS.curWk()!==cur) $('nwBanner').style.display='flex';
+  // 目標ロード
+  loadGoals();
+  // 背景描画
+  drawBg();
+  // レンダー
+  mount();
+})();
+</script>
+</body>
+</html>
