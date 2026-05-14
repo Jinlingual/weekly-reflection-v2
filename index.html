@@ -107,8 +107,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .gr-lbl.l{background:rgba(233,93,28,.13);color:#a04010}
 
 /* ── テキスト入力 ── */
-input[type=text],input[type=password],textarea{width:100%;padding:10px 12px;border:1.5px solid #e0d9d0;border-radius:10px;font-size:14px;font-family:inherit;outline:none;background:rgba(255,255,255,.65);color:#1a1a1a;resize:vertical;transition:border-color .2s,background .2s}
-input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:#2a9d8f;background:#fff}
+input[type=text],textarea{width:100%;padding:10px 12px;border:1.5px solid #e0d9d0;border-radius:10px;font-size:14px;font-family:inherit;outline:none;background:rgba(255,255,255,.65);color:#1a1a1a;resize:vertical;transition:border-color .2s,background .2s}
+input[type=text]:focus,textarea:focus{border-color:#2a9d8f;background:#fff}
 ::placeholder{color:#c0b9b0}
 .fl{font-size:12px;color:#8a8480;margin-bottom:5px;margin-top:10px}
 
@@ -162,35 +162,11 @@ input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:#2
 .pw{background:#ede8e0;border-radius:999px;height:7px;overflow:hidden;margin-bottom:4px}
 .pb{height:100%;background:linear-gradient(90deg,#2a9d8f,#56bdb4);border-radius:999px;transition:width .55s cubic-bezier(.4,0,.2,1)}
 
-/* ── GPT ── */
-.gpt-btn{width:100%;padding:13px;background:#1a1a1a;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px}
-.gpt-btn:hover{background:#2a9d8f}
-.gpt-btn:disabled{opacity:.6;cursor:not-allowed}
-.gpt-box{margin-top:11px;background:rgba(255,255,255,.5);border:1.5px solid rgba(26,26,26,.1);border-radius:12px;padding:15px}
-.gpt-box h4{font-size:13px;font-weight:700;color:#1a1a1a;margin:11px 0 4px}
-.gpt-box h4:first-child{margin-top:0}
-.gpt-box p{font-size:14px;line-height:1.75;color:#3a3a3a;margin-bottom:3px}
-.gpt-box ul{padding-left:15px;margin-bottom:4px}
-.gpt-box li{font-size:14px;line-height:1.75;color:#3a3a3a;margin-bottom:2px}
-.gpt-hint{font-size:12px;color:#aaa;text-align:center;margin-top:7px}
-.gpt-hint a{color:#2a9d8f;cursor:pointer;text-decoration:underline}
-
 /* ── エンドボタン ── */
 .eb{display:grid;gap:8px;margin-top:14px}
 .e-pr{padding:12px;background:transparent;color:#8a8480;border:1.5px solid #ddd8d0;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
 .e-rs{padding:13px;background:#1a1a1a;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
 .e-rs:hover{background:#2a9d8f}
-
-/* ── スピナー ── */
-.spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:rot .75s linear infinite;flex-shrink:0}
-@keyframes rot{to{transform:rotate(360deg)}}
-
-/* ── 設定モーダル ── */
-.cfg-btn{position:fixed;top:13px;right:13px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.65);border:1px solid rgba(0,0,0,.1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;z-index:200;backdrop-filter:blur(4px)}
-.s-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:center;justify-content:center;padding:18px}
-.s-mo{background:#faf6f0;border-radius:18px;padding:24px 20px;width:100%;max-width:380px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
-.s-mo h3{font-size:16px;font-weight:700;margin-bottom:12px}
-.s-note{font-size:11px;color:#999;margin-top:6px;line-height:1.6}
 
 /* ── モバイル ── */
 @media(max-width:520px){
@@ -204,7 +180,7 @@ input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:#2
 @media print{
   @page{size:A4;margin:13mm 17mm}
   body{background:#fff!important;padding:0;color:#000}
-  .bg,.cfg-btn,.eb,.gpt-btn,.dots,.br,.nwb{display:none!important}
+  .bg,.eb,.dots,.br,.nwb{display:none!important}
   .gp,.card{box-shadow:none;border:1px solid #ccc;margin-bottom:7mm;animation:none;break-inside:avoid}
   .gp-body{display:block!important}
   .rs{break-inside:avoid}
@@ -212,7 +188,6 @@ input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:#2
   .page-break{break-before:page}
   .chip.on{background:transparent!important;color:#1a7068!important;border-color:#2a9d8f!important}
   .chip.on::before{content:"☑ "}
-  .gpt-box{border:1px solid #ccc}
   .gp-grid{grid-template-columns:repeat(3,1fr)!important}
   /* 2カラムチップ */
   .p2c .chips{display:grid;grid-template-columns:1fr 1fr;gap:3px}
@@ -224,21 +199,6 @@ input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:#2
 <div class="bg" aria-hidden="true">
   <canvas id="bgC"></canvas>
   <div class="bg-ts"></div><div class="bg-tb"></div><div class="bg-td"></div>
-</div>
-
-<button class="cfg-btn" onclick="openCfg()" title="設定">⚙</button>
-
-<div class="s-ov" id="cfgOv" style="display:none" onclick="cfgOut(event)">
-  <div class="s-mo">
-    <h3>設定</h3>
-    <div class="fl">OpenAI APIキー（GPTフィードバック用）</div>
-    <input type="password" id="apiKey" placeholder="sk-...">
-    <div class="s-note">キーはブラウザの localStorage に保存されます。GPT-4o-mini を使用します（1回あたり約0.001〜0.003ドル）。</div>
-    <div class="br" style="margin-top:14px">
-      <button class="bs" onclick="closeCfg()">閉じる</button>
-      <button class="bp" onclick="saveCfg()">保存</button>
-    </div>
-  </div>
 </div>
 
 <div class="wrap">
@@ -309,12 +269,12 @@ const ADV = {
 // ══════════════════════════════════
 let S = fresh();
 function fresh() {
-  return { step:0, weeklyGoal:'', q1:null, q1env:[], q1body:[], q1cont:[], q1other:'', q2:null, q2est:[], q2ext:[], q2int:[], q2neg:[], q2other:'', q3:null, q3txt:'', q3cats:[], nextGoal:'', gptFb:null, gptLoading:false };
+  return { step:0, weeklyGoal:'', q1:null, q1env:[], q1body:[], q1cont:[], q1other:'', q2:null, q2est:[], q2ext:[], q2int:[], q2neg:[], q2other:'', q3:null, q3txt:'', q3cats:[], nextGoal:'' };
 }
 const STEP_RES = 5;
 
 // ══════════════════════════════════
-// LocalStorage
+// LocalStorage（目標・履歴・週キーのみ）
 // ══════════════════════════════════
 const LS = {
   goals()   { try { return JSON.parse(localStorage.getItem('rf_goals')||'{}'); } catch { return {}; } },
@@ -323,8 +283,7 @@ const LS = {
   push(e)   { const h=LS.hist(); h.unshift(e); localStorage.setItem('rf_hist',JSON.stringify(h.slice(0,52))); },
   last()    { return LS.hist()[0]||null; },
   curWk()   { return localStorage.getItem('rf_wk')||''; },
-  setWk(k)  { localStorage.setItem('rf_wk',k); },
-  key()     { return localStorage.getItem('oai_key')||''; }
+  setWk(k)  { localStorage.setItem('rf_wk',k); }
 };
 
 function wkKey(d) {
@@ -363,7 +322,8 @@ function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 const $ = id => document.getElementById(id);
 
 function toggleChip(btn, key, val) {
-  const arr=S[key], i=arr.indexOf(val);
+  const arr=S[key]; if(!Array.isArray(arr)) return;
+  const i=arr.indexOf(val);
   if(i>=0){arr.splice(i,1);btn.classList.remove('on');}else{arr.push(val);btn.classList.add('on');}
   if(['q2est','q2ext','q2int'].includes(key)) updAdvice();
 }
@@ -414,7 +374,6 @@ function rS0(){
 // ─── Step 1: Q1 目標達成？ ───
 function rS1(){
   const y=S.q1===true, n=S.q1===false;
-  // stateKey = S[stateKey] の配列キー, fKey = F[fKey] の選択肢キー（別々に持つ）
   const chips=(arr, stateKey, fKey)=>F[fKey].map(f=>`<button class="chip${arr.includes(f)?' on':''}" onclick="toggleChip(this,'${stateKey}','${esc(f)}')">${esc(f)}</button>`).join('');
   const branch=y?`<div class="branch">
     <div class="btitle">それはなぜ？（当てはまるものをクリック、複数OK）</div>
@@ -629,60 +588,6 @@ function updAdvice(){
 function restart(){ S=fresh(); mount(); }
 
 // ══════════════════════════════════
-// GPT
-// ══════════════════════════════════
-function gptHTML(){
-  if(S.gptLoading) return `<div class="gpt-btn" style="cursor:default;pointer-events:none"><div class="spin"></div>GPTが振り返りを分析中…</div>`;
-  if(S.gptFb) return `<div class="gpt-box">${md(S.gptFb)}</div><button class="gpt-btn" onclick="fetchGPT()" style="margin-top:10px;background:#555;font-size:13px">↺ 再取得</button>`;
-  if(!LS.key()) return `<div class="gpt-hint" style="padding:10px 0">APIキーを設定するとフィードバックが自動表示されます — <a onclick="openCfg()">設定はこちら</a></div>`;
-  // キーあり・未取得（autoFetchが働かなかった場合のフォールバック）
-  return `<button class="gpt-btn" onclick="fetchGPT()">✦ GPTフィードバックを取得</button>`;
-}
-function updGPT(){ const el=$('gptZ'); if(el) el.innerHTML=gptHTML(); }
-
-function buildPrompt(){
-  const g=LS.goals();
-  return `あなたは目標達成・習慣形成コーチです。以下の週次振り返りを読み、温かく建設的なフィードバックを日本語で提供してください。
-【ルール】完璧主義を強めない／小さな前進を認める／改善提案は小さく始められるものにする／200字程度で簡潔に。
-
-今週の目標：${S.weeklyGoal}
-Q1達成：${S.q1===true?'達成':S.q1===false?'未達':'未回答'}
-Q1成功要因：${[...S.q1env,...S.q1body,...S.q1cont].join('、')||'なし'}
-Q2計画崩れ：${S.q2===false?'なし':S.q2===true?'あり':'未回答'}
-Q2原因：${[...S.q2est,...S.q2ext,...S.q2int].join('、')||'なし'}
-Q3新たな気づき：${S.q3===true?(S.q3txt||'あり'):'なし'}
-短期目標：${g.short||'未設定'} 中期：${g.medium||'未設定'} 長期：${g.long||'未設定'}
-来週の目標：${S.nextGoal||'未設定'}
-
-以下の形式で返答してください：
-## 今週の振り返り
-## 良かった点
-## 来週への提案
-## メッセージ`;
-}
-
-async function fetchGPT(){
-  const key=LS.key(); if(!key){openCfg();return;}
-  S.gptLoading=true; updGPT();
-  try {
-    const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'user',content:buildPrompt()}],max_tokens:600,temperature:0.75})});
-    if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'API error');}
-    const d=await r.json(); S.gptFb=d.choices[0].message.content;
-  } catch(e){ S.gptFb=`エラー：${e.message}\nAPIキーや残高をご確認ください。`; }
-  S.gptLoading=false; updGPT();
-}
-
-function md(txt){
-  let h='',ul=false;
-  for(const ln of txt.split('\n')){
-    if(ln.startsWith('## ')){if(ul){h+='</ul>';ul=false;}h+=`<h4>${esc(ln.slice(3))}</h4>`;}
-    else if(ln.startsWith('- ')){if(!ul){h+='<ul>';ul=true;}h+=`<li>${esc(ln.slice(2))}</li>`;}
-    else if(ln.trim()){if(ul){h+='</ul>';ul=false;}h+=`<p>${esc(ln)}</p>`;}
-  }
-  if(ul)h+='</ul>'; return h;
-}
-
-// ══════════════════════════════════
 // PDF保存
 // ══════════════════════════════════
 function doPrint(){
@@ -690,14 +595,6 @@ function doPrint(){
   $('gpArr').classList.add('open');
   window.print();
 }
-
-// ══════════════════════════════════
-// 設定モーダル
-// ══════════════════════════════════
-function openCfg(){ $('apiKey').value=LS.key(); $('cfgOv').style.display='flex'; }
-function closeCfg(){ $('cfgOv').style.display='none'; }
-function cfgOut(e){ if(e.target===$('cfgOv')) closeCfg(); }
-function saveCfg(){ localStorage.setItem('oai_key',$('apiKey').value.trim()); closeCfg(); }
 
 // ══════════════════════════════════
 // 水彩背景キャンバス
